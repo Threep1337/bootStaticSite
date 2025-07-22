@@ -1,5 +1,4 @@
-
-
+import re
 from textnode import TextNode,TextType
 class HTMLNode():
     def __init__(self,tag = None,value = None,children = None,props = None):
@@ -104,18 +103,69 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
                         new_nodes.append(TextNode(split_text[x],text_type))
     return new_nodes
 
-def main():
-    #test_text = TextNode("this is a test with a *bold* word",TextType.TEXT)
-    #text_node_to_html_node(test_text)
-    #node = LeafNode(None, "Hello, world!")
-    #print(node)
-    #print(node.to_html())
-    node = TextNode("**bold** and _italic_", TextType.TEXT)
-    new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
-    new_nodes = split_nodes_delimiter(new_nodes, "_", TextType.ITALIC)
 
-    for node in new_nodes:
-        print (node)
+def split_nodes_image(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        current_text = node.text
+        matches = extract_markdown_images(node.text)
+        for match in matches:
+            split_text = current_text.split(f"![{match[0]}]({match[1]})",1)
+            if split_text[0] != "":
+                new_nodes.append(TextNode(split_text[0] ,TextType.TEXT))
+            current_text = split_text[1]
+
+            new_nodes.append(TextNode(match[0],TextType.IMAGE,url=match[1]))
+        if current_text != "":
+            new_nodes.append(TextNode(current_text,TextType.TEXT))
+    return new_nodes
+
+
+def split_nodes_link(old_nodes):
+    new_nodes = []
+    for node in old_nodes:
+        current_text = node.text
+        matches = extract_markdown_links(node.text)
+        for match in matches:
+            split_text = current_text.split(f"[{match[0]}]({match[1]})",1)
+            if split_text[0] != "":
+                new_nodes.append(TextNode(split_text[0] ,TextType.TEXT))
+            current_text = split_text[1]
+
+            new_nodes.append(TextNode(match[0],TextType.LINK,url=match[1]))
+        if current_text != "":
+            new_nodes.append(TextNode(current_text,TextType.TEXT))
+    
+    return new_nodes
+
+
+
+
+
+
+
+def extract_markdown_images(text):
+    matches = re.findall(r"!\[([^\]]+)\]\(([^\]]+)\)",text)
+    return matches
+
+def extract_markdown_links(text):
+    matches = re.findall(r"\[([^\]]+)\]\(([^\)]+)\)",text)
+    return matches
+
+def text_to_textnodes(text):
+    nodes = TextNode(text,TextType.TEXT)
+    nodes = split_nodes_delimiter([nodes],"**",TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes,"_",TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes,"`",TextType.CODE)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
+
+
+def main():
+    
+    print(text_to_textnodes("This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"))
+
 
 if __name__ == "__main__":
     main()

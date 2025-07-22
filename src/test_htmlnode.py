@@ -1,7 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode
-
+from htmlnode import HTMLNode, extract_markdown_images,extract_markdown_links
 class TestHTMLNode(unittest.TestCase):
 
     def test_props_to_html_equal(self):
@@ -27,6 +26,30 @@ class TestHTMLNode(unittest.TestCase):
         node = HTMLNode(tag="a",value="this is a test")
         node_props_html = node.props_to_html()
         self.assertEqual(node_props_html,'')
+
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_extract_markdown_images_multiple(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and ![image2](https://i.imgur.com/zjjcJKZ2.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png"),("image2", "https://i.imgur.com/zjjcJKZ2.png")], matches)
+
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text with a link [to boot dev](https://www.boot.dev)"
+        )
+        self.assertListEqual([("to boot dev", "https://www.boot.dev")], matches)
+
+    def test_extract_markdown_links_multiple(self):
+        matches = extract_markdown_links(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to boot dev2](https://www.boot2.dev)"
+        )
+        self.assertListEqual([("to boot dev", "https://www.boot.dev"),("to boot dev2", "https://www.boot2.dev")], matches)
 
 if __name__ == "__main__":
     unittest.main()
