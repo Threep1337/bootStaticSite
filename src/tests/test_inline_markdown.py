@@ -1,4 +1,11 @@
 import unittest
+import sys
+import os
+# Add the parent directory to the path
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, parent_dir)
+
+
 from htmlnode import split_nodes_delimiter,split_nodes_image,text_node_to_html_node,text_to_textnodes
 
 from textnode import TextNode, TextType
