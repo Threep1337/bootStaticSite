@@ -7,7 +7,6 @@ def markdown_to_html_node(markdown):
     pass
 
 
-
 def main():
     pass
 
