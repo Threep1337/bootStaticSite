@@ -39,7 +39,7 @@ class LeafNode(HTMLNode):
         return f"LeafNode({self.tag},{self.value},{self.props})"
     
 class ParentNode (HTMLNode):
-    def __init__(self,tag,children,props = None):
+    def __init__(self,tag,children=[],props = None):
         super().__init__(tag=tag,children=children,props=props)
     
     def to_html(self):
@@ -58,13 +58,17 @@ class ParentNode (HTMLNode):
 
     def __repr__(self):
         return f"ParentNode({self.tag},{self.value},{self.children},{self.props})"
-    
+
+
+
 def text_node_to_html_node(text_node):
     match text_node.text_type:
         case TextType.TEXT:
-            return LeafNode(None,text_node.text)
+            return LeafNode(None,text_node.text.replace("\n"," "))
         case TextType.BOLD:
-            return LeafNode("b",text_node.text)
+            return LeafNode("b",text_node.text.replace("\n"," "))
+        case TextType.ITALIC:
+            return LeafNode("i",text_node.text.replace("\n"," "))
         case TextType.CODE:
             return LeafNode("code",text_node.text)
         case TextType.LINK:
@@ -117,7 +121,7 @@ def split_nodes_image(old_nodes):
 
             new_nodes.append(TextNode(match[0],TextType.IMAGE,url=match[1]))
         if current_text != "":
-            new_nodes.append(TextNode(current_text,TextType.TEXT))
+            new_nodes.append(TextNode(current_text,node.text_type))
     return new_nodes
 
 
@@ -134,7 +138,7 @@ def split_nodes_link(old_nodes):
 
             new_nodes.append(TextNode(match[0],TextType.LINK,url=match[1]))
         if current_text != "":
-            new_nodes.append(TextNode(current_text,TextType.TEXT))
+            new_nodes.append(TextNode(current_text,node.text_type))
     
     return new_nodes
 
