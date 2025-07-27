@@ -1,5 +1,5 @@
+import re
 from markdown_blocks import markdown_to_html_node
-from extracttitle import extract_title
 import os
 
 def generate_page(from_path, template_path, dest_path):
@@ -26,9 +26,16 @@ def generate_page(from_path, template_path, dest_path):
         f.write(template_path_contents)
 
 
+def extract_title(markdown):
+    match = re.match("# (.+)",markdown)
+    if match:
+        return (match.group(1).strip())
+    else:
+        raise Exception("No valid title found in markdown.")
+
 
 def main():
-    pass
+    print(extract_title("# Hello"))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

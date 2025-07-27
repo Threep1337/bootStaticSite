@@ -1,6 +1,6 @@
 from textnode import TextNode, TextType
 from copystatic import copy_files_recursive
-from generate_page import generate_page
+from getcontent import generate_page
 
 
 def main():
