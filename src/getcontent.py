@@ -33,6 +33,18 @@ def extract_title(markdown):
     else:
         raise Exception("No valid title found in markdown.")
 
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    files = os.listdir(dir_path_content)
+    for file in files:
+        fullpath = os.path.join(dir_path_content,file)
+        if os.path.isfile(fullpath):
+            destpath = os.path.join(dest_dir_path,file)
+            destpath = os.path.splitext(destpath)[0]
+            destpath += '.html'
+            print(f"dest path is {destpath}")
+            generate_page(fullpath, template_path,destpath)
+        else:
+            generate_pages_recursive(fullpath, template_path, os.path.join(dest_dir_path,file))
 
 def main():
     print(extract_title("# Hello"))
